@@ -1,0 +1,11 @@
+.distignore
+.gitignore
+.github/
+.php-cs-fixer.php
+.phpunit.cache/
+bin/
+composer.lock
+node_modules/
+phpstan.neon
+phpunit.xml
+tests/

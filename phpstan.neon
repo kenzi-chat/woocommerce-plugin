@@ -1,0 +1,9 @@
+parameters:
+    level: 5
+    phpVersion: 80100
+    paths:
+        - kenzi-for-woocommerce.php
+        - src
+    bootstrapFiles:
+        - vendor/php-stubs/woocommerce-stubs/woocommerce-stubs.php
+        - vendor/php-stubs/woocommerce-stubs/woocommerce-packages-stubs.php
