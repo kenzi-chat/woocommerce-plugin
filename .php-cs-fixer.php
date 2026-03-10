@@ -5,7 +5,7 @@ declare(strict_types=1);
 $finder = PhpCsFixer\Finder::create()
     ->in(__DIR__ . '/src')
     ->in(__DIR__ . '/tests')
-    ->append([__DIR__ . '/kenzi-for-woocommerce.php']);
+    ->append([__DIR__ . '/kenzi-commerce.php']);
 
 return (new PhpCsFixer\Config())
     ->setRules([

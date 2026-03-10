@@ -1,8 +1,8 @@
 {
-    "name": "kenzi/kenzi-for-woocommerce",
-    "description": "Connect your WooCommerce store to Kenzi for customer messaging powered by real-time order and customer data.",
+    "name": "kenzi/kenzi-commerce",
+    "description": "Enable commerce data sync between WooCommerce and Kenzi.",
     "type": "wordpress-plugin",
-    "license": "MIT",
+    "license": "GPL-2.0-or-later",
     "homepage": "https://kenzi.chat/integrations/woocommerce",
     "authors": [
         {
@@ -15,7 +15,6 @@
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.65",
-        "php-stubs/woocommerce-stubs": "^9.0",
         "phpstan/extension-installer": "^1.4",
         "phpstan/phpstan": "^2.1",
         "phpunit/phpunit": "^11.0",
@@ -23,12 +22,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Kenzi\\WooCommerce\\": "src/"
+            "Kenzi\\Commerce\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Kenzi\\WooCommerce\\Tests\\": "tests/"
+            "Kenzi\\Commerce\\Tests\\": "tests/"
         }
     },
     "config": {
@@ -41,7 +40,7 @@
     "scripts": {
         "lint": "php-cs-fixer fix --dry-run --diff",
         "lint:fix": "php-cs-fixer fix",
-        "analyze": "phpstan analyse",
+        "analyze": "phpstan analyse --memory-limit=512M",
         "test": "phpunit"
     }
 }

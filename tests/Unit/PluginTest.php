@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Kenzi\WooCommerce\Tests\Unit;
+namespace Kenzi\Commerce\Tests\Unit;
 
-use Kenzi\WooCommerce\Plugin;
+use Kenzi\Commerce\Plugin;
 use PHPUnit\Framework\TestCase;
 
 final class PluginTest extends TestCase

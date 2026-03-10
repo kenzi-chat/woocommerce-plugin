@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 #
-# Build a distributable .zip for the Kenzi for WooCommerce plugin.
+# Build a distributable .zip for the Kenzi Commerce plugin.
 # Installs production deps, then packages everything not in .distignore.
 #
 set -euo pipefail
 
-PLUGIN_SLUG="kenzi-for-woocommerce"
+PLUGIN_SLUG="kenzi-commerce"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PLUGIN_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 BUILD_DIR="$(mktemp -d)"

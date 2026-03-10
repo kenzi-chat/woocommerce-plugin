@@ -7,7 +7,7 @@
 bin/
 composer.json
 composer.lock
-kenzi-for-woocommerce.zip
+kenzi-commerce.zip
 node_modules/
 phpstan.neon
 phpunit.xml
