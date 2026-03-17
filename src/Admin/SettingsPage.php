@@ -80,7 +80,7 @@ class SettingsPage extends WC_Settings_Page
                     // 3. Use the kenzi_secret from ChatSettings for webhook signing
                     // 4. Add a "Disable Webhooks" toggle once enabled
                     // 5. Clean up webhooks on plugin deactivation
-                    ?>
+        ?>
                     <button type="button" class="button" id="kenzi-commerce-webhooks" disabled>
                         <?php esc_html_e('Enable Webhooks', 'kenzi-commerce'); ?>
                     </button>
