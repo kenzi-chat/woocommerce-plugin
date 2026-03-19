@@ -29,6 +29,16 @@ final class Plugin
     {
     }
 
+    // Prevent cloning and unserialization of the singleton.
+    private function __clone()
+    {
+    }
+
+    public function __wakeup(): void
+    {
+        throw new \RuntimeException('Cannot unserialize singleton');
+    }
+
     /**
      * Initialize the plugin.
      *
@@ -37,6 +47,11 @@ final class Plugin
      */
     public function init(): void
     {
+        // Auto-register webhooks when conditions are met.
+        if (Settings::shouldWebhooksBeActive()) {
+            Webhook\NativeWebhookManager::ensureWebhooks();
+        }
+
         if (is_admin()) {
             $this->registerSettings();
             add_action('admin_notices', [$this, 'maybeShowUpgradeNotice']);
@@ -92,16 +107,16 @@ final class Plugin
     }
 
     /**
-     * AJAX handler to persist the commerce-enabled flag after a successful upgrade.
+     * AJAX handler to add the 'commerce' capability after a successful upgrade.
      */
     public function handleEnableAjax(): void
     {
         if (! current_user_can('manage_options')) {
-            wp_send_json_error('Unauthorized');
+            wp_send_json_error(esc_html__('Unauthorized', 'kenzi-commerce'));
         }
 
-        if (! wp_verify_nonce($_POST['_wpnonce'] ?? '', 'kenzi_commerce_enable')) {
-            wp_send_json_error('Invalid nonce');
+        if (! wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['_wpnonce'] ?? '')), 'kenzi_commerce_enable')) {
+            wp_send_json_error(esc_html__('Invalid nonce', 'kenzi-commerce'));
         }
 
         $capabilities = ChatSettings::getCapabilities();
@@ -112,4 +127,5 @@ final class Plugin
 
         wp_send_json_success();
     }
+
 }

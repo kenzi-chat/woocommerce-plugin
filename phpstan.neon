@@ -3,6 +3,11 @@ parameters:
     phpVersion: 80100
     paths:
         - kenzi-commerce.php
+        - uninstall.php
         - src
     scanDirectories:
         - ../wordpress/src
+    # Bootstrap WooCommerce stubs so PHPStan can resolve WC_Settings_Page
+    # and other WooCommerce types without scanning the full file.
+    bootstrapFiles:
+        - vendor/php-stubs/woocommerce-stubs/woocommerce-stubs.php

@@ -1,0 +1,30 @@
+/**
+ * Kenzi Commerce admin styles.
+ *
+ * Extracted from inline style= attributes in SettingsPage.php to follow
+ * WordPress best practices: external stylesheets can be cached, overridden
+ * by other plugins/themes, and don't require 'unsafe-inline' in CSP headers.
+ *
+ * @package Kenzi\Commerce
+ */
+
+/* Commerce enabled status (green text + icon) */
+.kenzi-commerce-status-enabled {
+    margin: 0;
+    color: #2e7d32;
+}
+
+.kenzi-commerce-status-enabled .dashicons {
+    color: #2e7d32;
+}
+
+/* Not connected warning (red text) */
+.kenzi-commerce-status-disconnected {
+    margin: 0;
+    color: #d63638;
+}
+
+/* Enable commerce prompt text */
+.kenzi-commerce-status-prompt {
+    margin: 0 0 10px;
+}
