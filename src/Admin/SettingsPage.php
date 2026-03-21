@@ -37,7 +37,7 @@ class SettingsPage extends WC_Settings_Page
         }
 
         // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only tab check
-        if (! isset($_GET['tab']) || $_GET['tab'] !== $this->id) {
+        if (! isset($_GET['tab']) || sanitize_key(wp_unslash($_GET['tab'])) !== $this->id) {
             return;
         }
 

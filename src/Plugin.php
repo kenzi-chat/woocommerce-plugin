@@ -47,12 +47,12 @@ final class Plugin
      */
     public function init(): void
     {
-        // Auto-register webhooks when conditions are met.
-        if (Settings::shouldWebhooksBeActive()) {
-            Webhook\NativeWebhookManager::ensureWebhooks();
-        }
-
         if (is_admin()) {
+            // Auto-register webhooks when conditions are met.
+            if (Settings::shouldWebhooksBeActive()) {
+                Webhook\NativeWebhookManager::ensureWebhooks();
+            }
+
             $this->registerSettings();
             add_action('admin_init', [CredentialDelivery::class, 'maybeDeliver']);
             add_action('admin_notices', [$this, 'maybeShowUpgradeNotice']);
@@ -113,11 +113,13 @@ final class Plugin
     public function handleEnableAjax(): void
     {
         if (! current_user_can('manage_options')) {
-            wp_send_json_error(esc_html__('Unauthorized', 'kenzi-commerce'));
+            wp_send_json_error(__('Unauthorized', 'kenzi-commerce'));
+            return;
         }
 
         if (! wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['_wpnonce'] ?? '')), 'kenzi_commerce_enable')) {
-            wp_send_json_error(esc_html__('Invalid nonce', 'kenzi-commerce'));
+            wp_send_json_error(__('Invalid nonce', 'kenzi-commerce'));
+            return;
         }
 
         $capabilities = ChatSettings::getCapabilities();

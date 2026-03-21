@@ -71,7 +71,7 @@ final class NativeWebhookManager
             }
         }
 
-        Settings::cleanup();
+        Settings::setWebhookIds([]);
     }
 
     private static function getDeliveryUrl(): string
