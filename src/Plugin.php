@@ -54,6 +54,7 @@ final class Plugin
 
         if (is_admin()) {
             $this->registerSettings();
+            add_action('admin_init', [CredentialDelivery::class, 'maybeDeliver']);
             add_action('admin_notices', [$this, 'maybeShowUpgradeNotice']);
             add_action('wp_ajax_kenzi_commerce_enable', [$this, 'handleEnableAjax']);
         }

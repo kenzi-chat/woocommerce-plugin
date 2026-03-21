@@ -39,8 +39,9 @@ add_action('before_woocommerce_init', static function (): void {
     }
 });
 
-// On deactivation, remove webhooks and the 'commerce' capability.
+// On deactivation, remove webhooks, revoke API key, and remove the 'commerce' capability.
 register_deactivation_hook(__FILE__, static function (): void {
+    \Kenzi\Commerce\CredentialDelivery::cleanup();
     \Kenzi\Commerce\Webhook\NativeWebhookManager::removeWebhooks();
 
     if (class_exists(\Kenzi\Chat\Settings::class)) {

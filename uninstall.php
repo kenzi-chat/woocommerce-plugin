@@ -38,6 +38,21 @@ if (is_array($webhookIds) && function_exists('wc_get_webhook')) {
 
 delete_option('kenzi_commerce_webhook_ids');
 
+// Revoke the WooCommerce API key generated for Kenzi.
+$apiKeyId = get_option('kenzi_commerce_api_key_id');
+
+if (is_numeric($apiKeyId)) {
+    global $wpdb;
+    $wpdb->delete(
+        $wpdb->prefix . 'woocommerce_api_keys',
+        ['key_id' => (int) $apiKeyId],
+        ['%d'],
+    );
+}
+
+delete_option('kenzi_commerce_api_key_id');
+delete_option('kenzi_commerce_credentials_delivered');
+
 // Remove the 'commerce' capability from the Chat plugin's capabilities list.
 // Uses get_option directly because the Chat plugin's autoloader may not be
 // available during uninstall.
