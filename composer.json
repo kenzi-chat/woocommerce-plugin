@@ -1,5 +1,5 @@
 {
-    "name": "kenzi/kenzi-commerce",
+    "name": "kenzi-chat/woocommerce-plugin",
     "description": "Enable commerce data sync between WooCommerce and Kenzi.",
     "type": "wordpress-plugin",
     "license": "GPL-2.0-or-later",
