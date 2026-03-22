@@ -3,14 +3,14 @@
 # Build a distributable WooCommerce plugin ZIP.
 #
 # The ZIP contains a single top-level directory named after the plugin slug
-# ("kenzi-for-woocommerce") with only production files — no tests, dev config,
+# ("kenzi-commerce") with only production files — no tests, dev config,
 # or dev dependencies. The output is written to the current working directory.
 #
 # Usage:  bash bin/build-zip.sh          (run from platforms/woocommerce/)
 
 set -euo pipefail
 
-SLUG="kenzi-for-woocommerce"
+SLUG="kenzi-commerce"
 ZIP_NAME="${SLUG}.zip"
 BUILD_DIR=$(mktemp -d)
 DEST="${BUILD_DIR}/${SLUG}"
