@@ -113,13 +113,11 @@ final class Plugin
     public function handleEnableAjax(): void
     {
         if (! current_user_can('manage_options')) {
-            wp_send_json_error(__('Unauthorized', 'kenzi-commerce'));
-            return;
+            wp_send_json_error(__('Unauthorized', 'kenzi-commerce')); // wp_send_json_error calls wp_die — never returns
         }
 
         if (! wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['_wpnonce'] ?? '')), 'kenzi_commerce_enable')) {
-            wp_send_json_error(__('Invalid nonce', 'kenzi-commerce'));
-            return;
+            wp_send_json_error(__('Invalid nonce', 'kenzi-commerce')); // wp_send_json_error calls wp_die — never returns
         }
 
         $capabilities = ChatSettings::getCapabilities();
