@@ -48,15 +48,25 @@ final class Plugin
     public function init(): void
     {
         if (is_admin()) {
-            // Auto-register webhooks when conditions are met.
-            if (Settings::shouldWebhooksBeActive()) {
-                Webhook\NativeWebhookManager::ensureWebhooks();
-            }
-
             $this->registerSettings();
+            add_action('admin_init', [self::class, 'maybeEnsureWebhooks']);
             add_action('admin_init', [CredentialDelivery::class, 'maybeDeliver']);
             add_action('admin_notices', [$this, 'maybeShowUpgradeNotice']);
             add_action('wp_ajax_kenzi_commerce_enable', [$this, 'handleEnableAjax']);
+        }
+    }
+
+    /**
+     * Register webhooks on admin_init when conditions are met.
+     *
+     * Deferred from plugins_loaded to admin_init so that (a) WooCommerce
+     * textdomains are loaded and (b) get_current_user_id() returns the
+     * logged-in admin, which NativeWebhookManager needs for payload generation.
+     */
+    public static function maybeEnsureWebhooks(): void
+    {
+        if (Settings::shouldWebhooksBeActive()) {
+            Webhook\NativeWebhookManager::ensureWebhooks();
         }
     }
 

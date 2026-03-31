@@ -113,7 +113,7 @@ final class CredentialDelivery
     {
         $secret = ChatSettings::getSharedSecret();
         $baseUrl = ChatSettings::getAppBase();
-        $instanceKey = home_url();
+        $instanceKey = preg_replace('#^https?://#', '', rtrim(home_url(), '/'));
 
         $url = rtrim($baseUrl, '/') . '/api/integrations/wordpress/' . urlencode($instanceKey) . '/credentials';
 

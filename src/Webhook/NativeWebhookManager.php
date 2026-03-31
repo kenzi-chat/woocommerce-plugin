@@ -27,7 +27,9 @@ final class NativeWebhookManager
      * Ensure webhooks are registered.
      *
      * Idempotent — skips if webhooks already exist. Safe to call on
-     * every admin load.
+     * every admin load. Must be called from `admin_init` or later so
+     * that get_current_user_id() returns the logged-in admin — WooCommerce
+     * uses this user to build the webhook payload via its internal REST API.
      */
     public static function ensureWebhooks(): void
     {
@@ -42,7 +44,7 @@ final class NativeWebhookManager
         foreach (self::TOPICS as $topic) {
             $webhook = new \WC_Webhook();
             $webhook->set_name('Kenzi: ' . $topic);
-            $webhook->set_user_id(0);
+            $webhook->set_user_id(get_current_user_id());
             $webhook->set_topic($topic);
             $webhook->set_secret($secret);
             $webhook->set_delivery_url($deliveryUrl);

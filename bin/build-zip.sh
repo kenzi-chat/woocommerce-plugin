@@ -21,7 +21,7 @@ trap cleanup EXIT
 mkdir -p "$DEST"
 
 # Copy production files
-cp -r src/ assets/ "$DEST/"
+cp -r src assets "$DEST/"
 cp kenzi-commerce.php uninstall.php LICENSE composer.json "$DEST/"
 
 # Install production autoloader (no dev dependencies)

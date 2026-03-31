@@ -30,9 +30,10 @@
 
         const upgradeUrl = config.connectUrl + '?' + new URLSearchParams({
             platform: 'wordpress',
-            instance_key: config.storeUrl,
+            instance_key: config.instanceKey,
             origin: config.storeUrl,
             nonce: currentNonce,
+            api_url: config.storeUrl,
             capabilities: 'commerce',
             admin_url: config.adminUrl,
         });
