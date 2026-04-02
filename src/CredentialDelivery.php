@@ -38,7 +38,7 @@ final class CredentialDelivery
      */
     public static function maybeDeliver(): void
     {
-        if (! is_user_logged_in()) {
+        if (! current_user_can('manage_options')) {
             return;
         }
 
@@ -113,7 +113,7 @@ final class CredentialDelivery
     {
         $secret = ChatSettings::getSharedSecret();
         $baseUrl = ChatSettings::getAppBase();
-        $instanceKey = preg_replace('#^https?://#', '', rtrim(home_url(), '/'));
+        $instanceKey = ChatSettings::getInstanceKey();
 
         $url = rtrim($baseUrl, '/') . '/api/integrations/wordpress/' . urlencode($instanceKey) . '/credentials';
 

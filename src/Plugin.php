@@ -65,6 +65,10 @@ final class Plugin
      */
     public static function maybeEnsureWebhooks(): void
     {
+        if (! current_user_can('manage_woocommerce')) {
+            return;
+        }
+
         if (Settings::shouldWebhooksBeActive()) {
             Webhook\NativeWebhookManager::ensureWebhooks();
         }

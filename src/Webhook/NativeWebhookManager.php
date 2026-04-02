@@ -33,8 +33,15 @@ final class NativeWebhookManager
      */
     public static function ensureWebhooks(): void
     {
-        if (Settings::getWebhookIds() !== []) {
+        $existingIds = Settings::getWebhookIds();
+
+        if (count($existingIds) >= count(self::TOPICS)) {
             return;
+        }
+
+        // Partial registration from a prior failed run — clean up before re-registering.
+        if ($existingIds !== []) {
+            self::removeWebhooks();
         }
 
         $deliveryUrl = self::getDeliveryUrl();
