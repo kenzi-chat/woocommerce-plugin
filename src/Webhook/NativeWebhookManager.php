@@ -21,6 +21,11 @@ final class NativeWebhookManager
     private const TOPICS = [
         'order.created',
         'order.updated',
+        'order.deleted',
+        'order.restored',
+        'customer.created',
+        'customer.updated',
+        'customer.deleted',
     ];
 
     /**
