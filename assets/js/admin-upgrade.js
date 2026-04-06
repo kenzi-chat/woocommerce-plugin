@@ -82,23 +82,38 @@
             currentNonce = null;
 
             // Update the stored credentials first (the shared secret is rotated
-            // during Connect), then enable the commerce capability.
+            // during Connect), then enable the commerce capability if selected.
+            const params = {
+                action: 'kenzi_save_connection',
+                _wpnonce: config.nonces.saveConnection,
+                workspace_id: event.data.workspace_id || '',
+                workspace_name: event.data.workspace_name || '',
+                secret: event.data.shared_secret || '',
+                integration_id: String(event.data.integration_id || ''),
+            };
+
+            // Forward the capabilities the user selected in the Connect popup.
+            if (Array.isArray(event.data.capabilities)) {
+                params.capabilities = event.data.capabilities.join(',');
+            }
+
+            const hasCommerce = Array.isArray(event.data.capabilities)
+                && event.data.capabilities.includes('commerce');
+
             fetch(config.ajaxUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: new URLSearchParams({
-                    action: 'kenzi_save_connection',
-                    _wpnonce: config.nonces.saveConnection,
-                    workspace_id: event.data.workspace_id || '',
-                    workspace_name: event.data.workspace_name || '',
-                    secret: event.data.shared_secret || '',
-                    integration_id: String(event.data.integration_id || ''),
-                }),
+                body: new URLSearchParams(params),
             })
                 .then(r => r.json())
                 .then(result => {
                     if (!result.success) {
                         alert(config.i18n.saveFailed + ' ' + (result.data || 'Unknown error'));
+                        return;
+                    }
+                    if (!hasCommerce) {
+                        // User unchecked commerce — skip enabling it.
+                        window.location.href = config.settingsUrl;
                         return;
                     }
                     // Credentials saved — enable the commerce capability.
