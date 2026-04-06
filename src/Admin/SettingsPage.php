@@ -65,6 +65,7 @@ class SettingsPage extends WC_Settings_Page
                 'ajaxUrl' => admin_url('admin-ajax.php'),
                 'connectUrl' => ChatSettings::getConnectUrl(),
                 'storeUrl' => home_url(),
+                'apiUrl' => rest_url('wc/v3'),
                 'instanceKey' => ChatSettings::getInstanceKey(),
                 'adminUrl' => admin_url(),
                 'settingsUrl' => admin_url('admin.php?page=wc-settings&tab=kenzi-commerce'),

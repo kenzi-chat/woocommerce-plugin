@@ -33,7 +33,7 @@
             instance_key: config.instanceKey,
             origin: config.storeUrl,
             nonce: currentNonce,
-            api_url: config.storeUrl,
+            api_url: config.apiUrl,
             requested_capabilities: 'commerce',
             admin_url: config.adminUrl,
         });
