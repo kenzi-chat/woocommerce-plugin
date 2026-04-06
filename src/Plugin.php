@@ -47,6 +47,8 @@ final class Plugin
      */
     public function init(): void
     {
+        add_action('kenzi_chat_disconnected', [self::class, 'handleChatDisconnected']);
+
         if (is_admin()) {
             $this->registerSettings();
             add_action('admin_init', [self::class, 'maybeEnsureWebhooks']);
@@ -119,6 +121,15 @@ final class Plugin
             </p>
         </div>
         <?php
+    }
+
+    /**
+     * Clean up commerce resources when the Chat plugin disconnects.
+     */
+    public static function handleChatDisconnected(): void
+    {
+        CredentialDelivery::cleanup();
+        Webhook\NativeWebhookManager::removeWebhooks();
     }
 
     /**
