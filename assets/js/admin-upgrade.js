@@ -34,7 +34,7 @@
             origin: config.storeUrl,
             nonce: currentNonce,
             api_url: config.storeUrl,
-            capabilities: 'commerce',
+            requested_capabilities: 'commerce',
             admin_url: config.adminUrl,
         });
 
