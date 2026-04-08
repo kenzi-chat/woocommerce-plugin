@@ -36,13 +36,13 @@ Both the initial Connect (from `kenzi-chat`) and the commerce upgrade (from this
 |-------|-------|--------|
 | `platform` | `wordpress` | Hardcoded |
 | `instance_key` | Site identifier (no scheme) | `home_url()` with scheme stripped |
-| `api_url` | Full site URL, no trailing slash | `rtrim(home_url(), '/')` |
+| `api_url` | Full WooCommerce REST API v3 base URL, no trailing slash | `rtrim(rest_url('wc/v3'), '/')` |
 | `nonce` | Random UUID | `crypto.randomUUID()` |
 | `origin` | Site URL | `home_url()` |
 | `capabilities` | `commerce` | Hardcoded (commerce upgrade) |
 | `admin_url` | WordPress admin URL, no trailing slash | `rtrim(admin_url(), '/')` |
 
-The `api_url` is stored by Kenzi in `integration.meta["api_url"]` and used as the base for WooCommerce REST API v3 calls: `{api_url}/wp-json/wc/v3`.
+The `api_url` is stored by Kenzi in `integration.meta["api_url"]` and used directly as the base URL for WooCommerce REST API calls. The plugin sends the fully-resolved REST base (including the `wp-json/wc/v3` path) because WordPress allows the REST prefix to be customized via the `rest_url_prefix` filter — Kenzi does not assume it.
 
 ### Credential Delivery
 
