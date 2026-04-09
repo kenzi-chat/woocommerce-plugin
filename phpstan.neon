@@ -3,7 +3,6 @@ parameters:
     phpVersion: 80100
     paths:
         - kenzi-commerce.php
-        - uninstall.php
         - src
     scanDirectories:
         - ../wordpress/src

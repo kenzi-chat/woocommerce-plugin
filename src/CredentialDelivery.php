@@ -152,7 +152,7 @@ final class CredentialDelivery
     /**
      * Revoke the stored API key and clear delivery state.
      *
-     * Called on plugin deactivation and uninstall.
+     * Called when the user explicitly disconnects via the admin UI.
      */
     public static function cleanup(): void
     {
