@@ -40,4 +40,3 @@ add_action('before_woocommerce_init', static function (): void {
         \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility('custom_order_tables', __FILE__, true);
     }
 });
-
