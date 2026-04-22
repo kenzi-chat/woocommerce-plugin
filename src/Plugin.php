@@ -50,6 +50,7 @@ final class Plugin
         add_action('kenzi_chat_disconnected', [self::class, 'handleChatDisconnected']);
 
         if (is_admin()) {
+            $this->registerPluginLinks();
             $this->registerSettings();
             add_action('admin_init', [self::class, 'maybeEnsureWebhooks']);
             add_action('admin_init', [CredentialDelivery::class, 'maybeDeliver']);
@@ -74,6 +75,24 @@ final class Plugin
         if (Settings::shouldWebhooksBeActive()) {
             Webhook\NativeWebhookManager::ensureWebhooks();
         }
+    }
+
+    /**
+     * Register plugin row meta links (Docs link on plugins page).
+     */
+    private function registerPluginLinks(): void
+    {
+        $pluginBasename = plugin_basename(KENZI_COMMERCE_PLUGIN_FILE);
+
+        add_filter('plugin_row_meta', static function (array $meta, string $file) use ($pluginBasename): array {
+            if ($file !== $pluginBasename) {
+                return $meta;
+            }
+
+            $meta[] = '<a href="' . esc_url('https://wiki.kenzi.chat/integrations/woocommerce/') . '">' . __('Docs', 'kenzi-commerce') . '</a>';
+
+            return $meta;
+        }, 10, 2);
     }
 
     /**

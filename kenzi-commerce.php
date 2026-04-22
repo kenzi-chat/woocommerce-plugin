@@ -2,7 +2,6 @@
 
 /**
  * Plugin Name: Kenzi Commerce
- * Plugin URI:  https://kenzi.chat
  * Description: Enable commerce data sync between WooCommerce and Kenzi.
  * Version:     1.0.0
  * Author:      Kenzi
