@@ -42,7 +42,7 @@ Both the initial Connect (from `kenzi-chat`) and the commerce upgrade (from this
 | `capabilities` | `commerce` | Hardcoded (commerce upgrade) |
 | `admin_url` | WordPress admin URL, no trailing slash | `rtrim(admin_url(), '/')` |
 
-The `api_url` is stored by Kenzi in `integration.meta["api_url"]` and used directly as the base URL for WooCommerce REST API calls. The plugin sends the fully-resolved REST base (including the `wp-json/wc/v3` path) because WordPress allows the REST prefix to be customized via the `rest_url_prefix` filter — Kenzi does not assume it.
+The `api_url` is stored by Kenzi in `integration.meta["api_url"]` and used directly as the base URL for WooCommerce REST API calls. The WooCommerce plugin overrides `api_url` to `home_url('/wp-json/wc/v3')` via the `kenzi_configure_config` filter; widget-only installs use `home_url('/wp-json')`.
 
 ### Credential Delivery
 

@@ -4,13 +4,10 @@ declare(strict_types=1);
 
 namespace Kenzi\Commerce;
 
-use Kenzi\Chat\Settings as ChatSettings;
+use Kenzi\Chat\Settings as KenziSettings;
 
 /**
  * Main plugin class for Kenzi Commerce.
- *
- * Registers a WooCommerce settings tab and an admin notice directing
- * users to enable commerce data sync.
  */
 final class Plugin
 {
@@ -48,32 +45,10 @@ final class Plugin
     public function init(): void
     {
         add_action('kenzi_chat_disconnected', [self::class, 'handleChatDisconnected']);
+        add_filter('kenzi_configure_config', [self::class, 'extendConfigurePayload']);
 
         if (is_admin()) {
             $this->registerPluginLinks();
-            $this->registerSettings();
-            add_action('admin_init', [self::class, 'maybeEnsureWebhooks']);
-            add_action('admin_init', [CredentialDelivery::class, 'maybeDeliver']);
-            add_action('admin_notices', [$this, 'maybeShowUpgradeNotice']);
-            add_action('wp_ajax_kenzi_commerce_enable', [$this, 'handleEnableAjax']);
-        }
-    }
-
-    /**
-     * Register webhooks on admin_init when conditions are met.
-     *
-     * Deferred from plugins_loaded to admin_init so that (a) WooCommerce
-     * textdomains are loaded and (b) get_current_user_id() returns the
-     * logged-in admin, which NativeWebhookManager needs for payload generation.
-     */
-    public static function maybeEnsureWebhooks(): void
-    {
-        if (! current_user_can('manage_woocommerce')) {
-            return;
-        }
-
-        if (Settings::shouldWebhooksBeActive()) {
-            Webhook\NativeWebhookManager::ensureWebhooks();
         }
     }
 
@@ -89,57 +64,55 @@ final class Plugin
                 return $meta;
             }
 
-            $meta[] = '<a href="' . esc_url('https://wiki.kenzi.chat/integrations/woocommerce/') . '">' . __('Docs', 'kenzi-commerce') . '</a>';
+            $meta[] = '<a href="' . esc_url('https://wiki.kenzi.chat/integrations/woocommerce/') . '">' . esc_html__('Docs', 'kenzi-commerce') . '</a>';
 
             return $meta;
         }, 10, 2);
     }
 
     /**
-     * Register the WooCommerce settings tab.
+     * Extend the configure config payload with WooCommerce credentials.
+     *
+     * Hooked into `kenzi_configure_config` (fired by the WordPress
+     * plugin's POST /kenzi/configure). Mints a WC REST API key
+     * and webhook subscriptions, then merges them into the config.
+     *
+     * @param array<string, mixed> $config Base config from the WordPress plugin.
+     * @return array<string, mixed>|\WP_Error
      */
-    private function registerSettings(): void
+    public static function extendConfigurePayload(array $config): array|\WP_Error
     {
-        add_filter('woocommerce_get_settings_pages', static function (array $settings): array {
-            $settings[] = new Admin\SettingsPage();
-
-            return $settings;
-        });
-    }
-
-    /**
-     * Show a notice linking to the settings tab if commerce is not yet enabled.
-     */
-    public function maybeShowUpgradeNotice(): void
-    {
-        if (! current_user_can('manage_options')) {
-            return;
+        // Only mint commerce artifacts if the commerce grant is active.
+        if (! KenziSettings::hasGrant('commerce')) {
+            return $config;
         }
 
-        if (! ChatSettings::isConnected()) {
-            return;
+        // Override api_url with the WooCommerce REST v3 base.
+        $config['api_url'] = home_url('/wp-json/wc/v3');
+
+        // Mint credentials only if none exist yet. WooCommerce hashes the
+        // consumer_key on insert, so plaintext is only available at mint
+        // time — we send it to Kenzi once and skip on subsequent configures.
+        if (! CredentialDelivery::hasValidKey()) {
+            $keys = CredentialDelivery::generateApiKey();
+
+            if ($keys === null) {
+                return new \WP_Error('mint_failed', 'Failed to generate WooCommerce API key.', ['status' => 500]);
+            }
+
+            Settings::setApiKeyId($keys['key_id']);
+
+            $config['consumer_key'] = $keys['consumer_key'];
+            $config['consumer_secret'] = $keys['consumer_secret'];
         }
 
-        if (ChatSettings::hasCapability('commerce')) {
-            return;
+        // Ensure webhook subscriptions (already idempotent).
+        if (! Webhook\NativeWebhookManager::ensureWebhooks()) {
+            return new \WP_Error('webhook_failed', 'Failed to register WooCommerce webhooks.', ['status' => 500]);
         }
+        $config['webhook_ids'] = array_map('strval', Settings::getWebhookIds());
 
-        $settingsUrl = admin_url('admin.php?page=wc-settings&tab=kenzi-commerce');
-
-        ?>
-        <div class="notice notice-info is-dismissible">
-            <p>
-                <strong><?php esc_html_e('Kenzi Commerce', 'kenzi-commerce'); ?>:</strong>
-                <?php esc_html_e(
-                    'Enable commerce data sync to show order and customer data in your Kenzi inbox.',
-                    'kenzi-commerce',
-                ); ?>
-                <a href="<?php echo esc_url($settingsUrl); ?>">
-                    <?php esc_html_e('Go to settings', 'kenzi-commerce'); ?> &rarr;
-                </a>
-            </p>
-        </div>
-        <?php
+        return $config;
     }
 
     /**
@@ -150,27 +123,4 @@ final class Plugin
         CredentialDelivery::cleanup();
         Webhook\NativeWebhookManager::removeWebhooks();
     }
-
-    /**
-     * AJAX handler to add the 'commerce' capability after a successful upgrade.
-     */
-    public function handleEnableAjax(): void
-    {
-        if (! current_user_can('manage_options')) {
-            wp_send_json_error(__('Unauthorized', 'kenzi-commerce')); // wp_send_json_error calls wp_die — never returns
-        }
-
-        if (! wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['_wpnonce'] ?? '')), 'kenzi_commerce_enable')) {
-            wp_send_json_error(__('Invalid nonce', 'kenzi-commerce')); // wp_send_json_error calls wp_die — never returns
-        }
-
-        $capabilities = ChatSettings::getCapabilities();
-        if (! in_array('commerce', $capabilities, true)) {
-            $capabilities[] = 'commerce';
-            ChatSettings::setCapabilities($capabilities);
-        }
-
-        wp_send_json_success();
-    }
-
 }

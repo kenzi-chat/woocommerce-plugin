@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Kenzi\Commerce\Webhook;
 
-use Kenzi\Chat\Settings as ChatSettings;
+use Kenzi\Chat\Settings as KenziSettings;
 use Kenzi\Commerce\Settings;
 
 /**
@@ -31,31 +31,41 @@ final class NativeWebhookManager
     /**
      * Ensure webhooks are registered.
      *
-     * Idempotent — skips if webhooks already exist. Safe to call on
-     * every admin load. Must be called from `admin_init` or later so
-     * that get_current_user_id() returns the logged-in admin — WooCommerce
-     * uses this user to build the webhook payload via its internal REST API.
+     * Idempotent — skips if webhooks already exist. Returns false if
+     * any webhook failed to register. Must be called from a context
+     * where get_current_user_id() returns the logged-in admin —
+     * WooCommerce uses this user to build the webhook payload.
      */
-    public static function ensureWebhooks(): void
+    public static function ensureWebhooks(): bool
     {
-        $existingIds = Settings::getWebhookIds();
+        $secret = KenziSettings::getSharedSecret();
 
-        if (count($existingIds) >= count(self::TOPICS)) {
-            return;
+        if ($secret === null) {
+            return false;
         }
 
-        // Partial registration from a prior failed run — clean up before re-registering.
+        $existingIds = Settings::getWebhookIds();
+
+        if (count($existingIds) === count(self::TOPICS)) {
+            // Verify all stored IDs still exist — any external deletion triggers full re-registration.
+            $allExist = ! in_array(null, array_map('wc_get_webhook', array_map('intval', $existingIds)), true);
+
+            if ($allExist) {
+                return true;
+            }
+        }
+
+        // Stale, partial, or externally-deleted — clean up before re-registering.
         if ($existingIds !== []) {
             self::removeWebhooks();
         }
 
         $deliveryUrl = self::getDeliveryUrl();
-        $secret = ChatSettings::getSharedSecret();
         $ids = [];
 
         foreach (self::TOPICS as $topic) {
             $webhook = new \WC_Webhook();
-            $webhook->set_name('Kenzi: ' . $topic);
+            $webhook->set_name('Kenzi ' . $topic);
             $webhook->set_user_id(get_current_user_id());
             $webhook->set_topic($topic);
             $webhook->set_secret($secret);
@@ -70,6 +80,8 @@ final class NativeWebhookManager
         }
 
         Settings::setWebhookIds($ids);
+
+        return count($ids) === count(self::TOPICS);
     }
 
     /**
@@ -90,6 +102,6 @@ final class NativeWebhookManager
 
     private static function getDeliveryUrl(): string
     {
-        return rtrim(ChatSettings::getAppBase(), '/') . '/webhooks/woo-commerce';
+        return rtrim(KenziSettings::getAppBase(), '/') . '/webhooks/woo-commerce';
     }
 }
