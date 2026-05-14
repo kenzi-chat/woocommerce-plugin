@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Check WooCommerce plugin
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout WooCommerce plugin
+        uses: actions/checkout@v6
+        with:
+          path: woocommerce
+
+      - name: Checkout WordPress plugin
+        uses: actions/checkout@v6
+        with:
+          repository: kenzi-chat/wordpress-plugin
+          path: wordpress
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          tools: composer
+          coverage: none
+
+      - name: Validate Composer metadata
+        working-directory: woocommerce
+        run: composer validate --strict
+
+      - name: Install dependencies
+        working-directory: woocommerce
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Run PHP-CS-Fixer
+        working-directory: woocommerce
+        run: vendor/bin/php-cs-fixer fix --dry-run --diff
+
+      - name: Run PHPStan
+        working-directory: woocommerce
+        run: vendor/bin/phpstan analyse
+
+      - name: Run PHPUnit
+        working-directory: woocommerce
+        run: vendor/bin/phpunit
+
+      - name: Build plugin zip
+        working-directory: woocommerce
+        run: bash bin/build-zip.sh
+
+      - name: Verify plugin zip
+        working-directory: woocommerce
+        run: test -f kenzi-commerce.zip
