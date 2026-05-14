@@ -86,7 +86,28 @@ This plugin requires the `kenzi-chat` WordPress plugin to be installed and conne
 ## Testing
 
 ```bash
-cd platforms/woocommerce
 composer install
 vendor/bin/phpunit
 ```
+
+## Quality tools
+
+Run commands from the repository root.
+
+```bash
+composer validate --strict
+composer lint
+composer analyze
+composer test
+bash bin/build-zip.sh
+```
+
+## Releases
+
+Customer releases are native `v*` tags from this repository. The tag version
+without the `v` prefix must match both `Version:` and
+`KENZI_COMMERCE_VERSION` in `kenzi-commerce.php`.
+
+GitHub release ZIPs are the initial install channel. They do not provide native
+WordPress auto-update. If a WordPress.org listing is approved later, add SVN
+release automation before using that channel.
