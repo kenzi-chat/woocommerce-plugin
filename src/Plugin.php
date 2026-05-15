@@ -87,13 +87,6 @@ final class Plugin
             return $config;
         }
 
-        // Override rest_url with the WordPress REST base.
-        // Use rest_url() instead of home_url('/wp-json') so the URL works
-        // regardless of the site's permalink settings. Without pretty
-        // permalinks, rest_url() returns the index.php?rest_route= form.
-        // The WooCommerce API version (/wc/v3) is appended by the Elixir client.
-        $config['rest_url'] = rest_url();
-
         // Mint credentials only if none exist yet. WooCommerce hashes the
         // consumer_key on insert, so plaintext is only available at mint
         // time — we send it to Kenzi once and skip on subsequent configures.
